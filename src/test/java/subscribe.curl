@@ -1,0 +1,1 @@
+curl -H "Content-Type: application/json" -X POST -d "{\"userid\":4711,\"token\":\"my token\",\"platform\":\"ANDROID\",\"public_key\":\"my public key\",\"kategorien\":[\"POSTFACH\",\"POSTFACH\"]}" http://localhost:2907/push/subscribe/

@@ -1,0 +1,4 @@
+2022-05-22 12:22:43 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Datenumwandlungsfehler beim Umwandeln von "'ANDROID' (PUSH_DEVICE: ""PLATFORM"" INTEGER)"
+Data conversion error converting "'ANDROID' (PUSH_DEVICE: ""PLATFORM"" INTEGER)"; SQL statement:
+insert into push_device (id, platform, public_key, token, tsp, userid, version) values (default, ?, ?, ?, ?, ?, ?) [22018-200]

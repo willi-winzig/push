@@ -1,0 +1,1 @@
+curl -H "Content-Type: application/json" -X POST -d "{\"userid\":4711,\"message\":\"my message\",\"category\":\"POSTFACH\"}" http://localhost:2907/push/order/
