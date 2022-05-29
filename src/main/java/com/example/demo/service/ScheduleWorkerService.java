@@ -2,14 +2,12 @@ package com.example.demo.service;
 
 import com.example.demo.entity.PushOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -18,27 +16,16 @@ import java.util.List;
 @EnableAsync
 public class ScheduleWorkerService {
 
-    @Autowired private PushOrderService pushOrderService;
+    @Autowired
+    private PushOrderService pushOrderService;
 
-    @Value("${schedule.worker.enabled}")
-    private boolean scheduleWorkerEnabled;
-
-    @Value("${schedule.worker.quantity}")
-    private int quantity;
-
-    @Value("${schedule.worker.start}")
-    private String start;
-
-    @Value("${schedule.worker.end}")
-    private String end;
-
-    @Value("${schedule.worker.interval}")
-    private Duration scheduleWorkerInterval;
+    @Autowired
+    private ConverterService converterService;
 
     @Scheduled(fixedRateString = "#{@converterService.getWorkerInterval()}")
     @Async
     public void worker() {
-        if (!scheduleWorkerEnabled) {
+        if (!converterService.isScheduleWorkerEnabled()) {
             return; // Schedule nicht aktiv
         }
 
@@ -46,10 +33,10 @@ public class ScheduleWorkerService {
         Date heute = new Date();
 
         // Schon genug in dem Interval verarbeitet?
-        Date abStart = new Date(heute.getTime() - scheduleWorkerInterval.toMillis());
+        Date abStart = new Date(heute.getTime() - converterService.getScheduleWorkerInterval().toMillis());
 
         long verarbeitet = pushOrderService.countBySendGreaterThan(abStart);
-        if (verarbeitet >= quantity) {
+        if (verarbeitet >= converterService.getQuantity()) {
             return; // genug verarbeitet
         }
 
@@ -57,8 +44,8 @@ public class ScheduleWorkerService {
                 pushOrderService.findBySendIsNullOrderByOrdertsp(
                         PageRequest.of(0, 1)); // immer nur 1 Order pro Durchlauf
 
-        if (now.isAfter(LocalTime.parse(start))
-                && now.isBefore(LocalTime.parse(end))
+        if (now.isAfter(LocalTime.parse(converterService.getStart()))
+                && now.isBefore(LocalTime.parse(converterService.getEnd()))
                 && !orders.isEmpty()) {
             orders.forEach(
                     o -> {

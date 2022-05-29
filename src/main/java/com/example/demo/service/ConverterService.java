@@ -17,6 +17,39 @@ public class ConverterService {
     @Value("${schedule.worker.interval}")
     private Duration scheduleWorkerInterval;
 
+    @Value("${schedule.worker.enabled}")
+    private boolean scheduleWorkerEnabled;
+
+    @Value("${schedule.worker.start}")
+    private String start;
+
+    @Value("${schedule.worker.end}")
+    private String end;
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public Duration getScheduleInsertInterval() {
+        return scheduleInsertInterval;
+    }
+
+    public Duration getScheduleWorkerInterval() {
+        return scheduleWorkerInterval;
+    }
+
+    public boolean isScheduleWorkerEnabled() {
+        return scheduleWorkerEnabled;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public String getEnd() {
+        return end;
+    }
+
     public String getInsertInterval() {
         return String.valueOf(scheduleInsertInterval.toMillis());
     }
