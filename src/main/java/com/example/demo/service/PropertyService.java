@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 
 @Service
-public class ConverterService {
+public class PropertyService {
 
     @Value("${schedule.worker.quantity}")
     private int quantity;

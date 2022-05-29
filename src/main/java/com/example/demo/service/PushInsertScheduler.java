@@ -8,14 +8,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ScheduleInsertService {
+public class PushInsertScheduler {
 
     @Autowired private PushOrderService pushOrderService;
 
     @Value("${schedule.insert.enabled}")
     private boolean scheduleInsertEnabled;
 
-    @Scheduled(fixedRateString = "#{@converterService.getInsertInterval()}")
+    @Scheduled(fixedRateString = "#{@propertyService.getInsertInterval()}")
     public void insert() {
         if (scheduleInsertEnabled) {
             PushOrder pushOrder = new PushOrder(162032L, Kategorie.POSTFACH, "param", 100L);

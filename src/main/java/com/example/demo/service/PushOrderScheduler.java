@@ -14,18 +14,18 @@ import java.util.List;
 
 @Service
 @EnableAsync
-public class ScheduleWorkerService {
+public class PushOrderScheduler {
 
     @Autowired
     private PushOrderService pushOrderService;
 
     @Autowired
-    private ConverterService converterService;
+    private PropertyService propertyService;
 
-    @Scheduled(fixedRateString = "#{@converterService.getWorkerInterval()}")
+    @Scheduled(fixedRateString = "#{@propertyService.getWorkerInterval()}")
     @Async
     public void worker() {
-        if (!converterService.isScheduleWorkerEnabled()) {
+        if (!propertyService.isScheduleWorkerEnabled()) {
             return; // Schedule nicht aktiv
         }
 
@@ -33,10 +33,10 @@ public class ScheduleWorkerService {
         Date heute = new Date();
 
         // Schon genug in dem Interval verarbeitet?
-        Date abStart = new Date(heute.getTime() - converterService.getScheduleWorkerInterval().toMillis());
+        Date abStart = new Date(heute.getTime() - propertyService.getScheduleWorkerInterval().toMillis());
 
         long verarbeitet = pushOrderService.countBySendGreaterThan(abStart);
-        if (verarbeitet >= converterService.getQuantity()) {
+        if (verarbeitet >= propertyService.getQuantity()) {
             return; // genug verarbeitet
         }
 
@@ -44,8 +44,8 @@ public class ScheduleWorkerService {
                 pushOrderService.findBySendIsNullOrderByOrdertsp(
                         PageRequest.of(0, 1)); // immer nur 1 Order pro Durchlauf
 
-        if (now.isAfter(LocalTime.parse(converterService.getStart()))
-                && now.isBefore(LocalTime.parse(converterService.getEnd()))
+        if (now.isAfter(LocalTime.parse(propertyService.getStart()))
+                && now.isBefore(LocalTime.parse(propertyService.getEnd()))
                 && !orders.isEmpty()) {
             orders.forEach(
                     o -> {
