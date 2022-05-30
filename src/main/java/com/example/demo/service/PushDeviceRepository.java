@@ -4,7 +4,7 @@ import com.example.demo.entity.Platform;
 import com.example.demo.entity.PushDevice;
 import org.springframework.data.repository.CrudRepository;
 
-public interface PushDeviceService extends CrudRepository<PushDevice, Long> {
+public interface PushDeviceRepository extends CrudRepository<PushDevice, Long> {
 
     PushDevice findByUserid(Long userid);
 

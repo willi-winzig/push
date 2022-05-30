@@ -16,21 +16,23 @@ public class PushDevice implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version private Long version;
+    @Version
+    private Long version;
 
-    @NaturalId private Long userid;
+    @NaturalId
+    private Long userid;
 
-    @Column(name="token",length = 100)
+    @Column(name = "token", length = 100)
     private String token;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="platform",length = 100)
+    @Column(name = "platform", length = 100)
     private Platform platform;
 
     private String public_key;
 
     @OneToMany(
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             mappedBy = "pushDevice",
             orphanRemoval = true,
             cascade = CascadeType.ALL)
@@ -38,7 +40,8 @@ public class PushDevice implements Serializable {
 
     private Date tsp = new Date();
 
-    private PushDevice() {}
+    private PushDevice() {
+    }
 
     public PushDevice(Long userid) {
         this.userid = userid;
@@ -85,8 +88,17 @@ public class PushDevice implements Serializable {
 
     public Set<String> getCategoriesAsStringSet() {
         Set<String> set = new HashSet<>();
-        for (PushCategory c: getCategories()) {
+        for (PushCategory c : getCategories()) {
             set.add(c.getKategorie().name());
+        }
+        return set;
+
+    }
+
+    public Set<Kategorie> getKategorien() {
+        Set<Kategorie> set = new HashSet<>();
+        for (PushCategory c : getCategories()) {
+            set.add(c.getKategorie());
         }
         return set;
 

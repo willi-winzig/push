@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class PushInsertScheduler {
 
-    @Autowired private PushOrderService pushOrderService;
+    @Autowired
+    private PushOrderRepository pushOrderRepository;
 
     @Value("${schedule.insert.enabled}")
     private boolean scheduleInsertEnabled;
@@ -18,8 +19,8 @@ public class PushInsertScheduler {
     @Scheduled(fixedRateString = "#{@propertyService.getInsertInterval()}")
     public void insert() {
         if (scheduleInsertEnabled) {
-            PushOrder pushOrder = new PushOrder(162032L, Kategorie.POSTFACH, "param", 100L);
-            pushOrderService.save(pushOrder);
+            PushOrder pushOrder = new PushOrder(162032L, Kategorie.POSTFACH, "payload");
+            pushOrderRepository.save(pushOrder);
         }
     }
 }

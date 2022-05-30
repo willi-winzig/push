@@ -4,7 +4,7 @@ import com.example.demo.entity.Kategorie;
 import com.example.demo.entity.Platform;
 import com.example.demo.entity.PushCategory;
 import com.example.demo.entity.PushDevice;
-import com.example.demo.service.PushDeviceService;
+import com.example.demo.service.PushDeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,7 @@ import java.util.Set;
 @RequestMapping(path = "/push")
 public class SubscribeApi {
 
-    @Autowired private PushDeviceService pushDeviceService;
+    @Autowired private PushDeviceRepository pushDeviceRepository;
 
     @PostMapping(path = "/subscribe")
     public @ResponseBody String subscribe(@RequestBody SubscribeRequest subscribeRequest) {
@@ -28,15 +28,15 @@ public class SubscribeApi {
         Platform platform = Platform.valueOf(subscribeRequest.platform);
 
         PushDevice pushDeviceMitTokenAndPlatform =
-                pushDeviceService.findByTokenAndPlatform(subscribeRequest.token, platform);
+                pushDeviceRepository.findByTokenAndPlatform(subscribeRequest.token, platform);
 
         if (pushDeviceMitTokenAndPlatform != null) {
             if (!pushDeviceMitTokenAndPlatform.getUserid().equals(subscribeRequest.userid)) {
-                pushDeviceService.delete(pushDeviceMitTokenAndPlatform);
+                pushDeviceRepository.delete(pushDeviceMitTokenAndPlatform);
             }
         }
 
-        PushDevice pushDevice = pushDeviceService.findByUserid(subscribeRequest.userid);
+        PushDevice pushDevice = pushDeviceRepository.findByUserid(subscribeRequest.userid);
 
         if (pushDevice == null) {
             pushDevice = new PushDevice(subscribeRequest.userid);
@@ -48,7 +48,7 @@ public class SubscribeApi {
         pushDevice.getCategories().clear();
         pushDevice.getCategories().addAll(getCategories(subscribeRequest.kategorien, pushDevice));
 
-        pushDeviceService.save(pushDevice);
+        pushDeviceRepository.save(pushDevice);
         return "PushDevice inserted/updated";
     }
 

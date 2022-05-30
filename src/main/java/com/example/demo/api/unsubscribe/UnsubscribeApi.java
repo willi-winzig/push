@@ -1,7 +1,7 @@
 package com.example.demo.api.unsubscribe;
 
 import com.example.demo.entity.PushDevice;
-import com.example.demo.service.PushDeviceService;
+import com.example.demo.service.PushDeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(path = "/push")
 public class UnsubscribeApi {
 
-    @Autowired private PushDeviceService pushDeviceService;
+    @Autowired private PushDeviceRepository pushDeviceRepository;
 
     @PostMapping(path = "/unsubscribe")
     public @ResponseBody String subscribe(@RequestBody UnsubscribeRequest unsubscribeRequest) {
 
-        PushDevice pushDeviceDesUsers = pushDeviceService.findByUserid(unsubscribeRequest.userid);
+        PushDevice pushDeviceDesUsers = pushDeviceRepository.findByUserid(unsubscribeRequest.userid);
         if (pushDeviceDesUsers != null) {
-            pushDeviceService.delete(pushDeviceDesUsers);
+            pushDeviceRepository.delete(pushDeviceDesUsers);
             return "unsubscribe with delete";
         }
         return "unsubscribe without delete";

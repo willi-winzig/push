@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Entity
@@ -11,34 +13,29 @@ public class PushOrder implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version private Long version;
+    @Version
+    private Long version;
 
     private Long userid;
 
     @Enumerated(EnumType.STRING)
     private Kategorie kategorie;
 
-    private String param_name;
+    private String payload;
 
-    private Long param_value;
+    private Date expiration;
 
-    @Column(name = "ORDER_TSP")
-    private Date ordertsp = new Date();
-
-    @Column(name = "SEND_TSP")
     private Date send;
 
-    private String reason;
+    private PushOrder() {
+    }
 
-    private Date reason_tsp;
-
-    private PushOrder() {}
-
-    public PushOrder(Long userid, Kategorie kategorie, String param_name, Long param_value) {
+    public PushOrder(Long userid, Kategorie kategorie, String payload) {
         this.userid = userid;
         this.kategorie = kategorie;
-        this.param_name = param_name;
-        this.param_value = param_value;
+        this.payload = payload;
+        Instant expireAt = new Date().toInstant();
+        this.expiration = Date.from(expireAt.plus(3, ChronoUnit.DAYS));
     }
 
     public Long getId() {
@@ -73,28 +70,20 @@ public class PushOrder implements Serializable {
         this.kategorie = kategorie;
     }
 
-    public String getParam_name() {
-        return param_name;
+    public String getPayload() {
+        return payload;
     }
 
-    public void setParam_name(String param_name) {
-        this.param_name = param_name;
+    public void setPayload(String payload) {
+        this.payload = payload;
     }
 
-    public Long getParam_value() {
-        return param_value;
+    public Date getExpiration() {
+        return expiration;
     }
 
-    public void setParam_value(Long param_value) {
-        this.param_value = param_value;
-    }
-
-    public Date getOrdertsp() {
-        return ordertsp;
-    }
-
-    public void setOrdertsp(Date ordertsp) {
-        this.ordertsp = ordertsp;
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
     }
 
     public Date getSend() {
@@ -105,19 +94,7 @@ public class PushOrder implements Serializable {
         this.send = send;
     }
 
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public Date getReason_tsp() {
-        return reason_tsp;
-    }
-
-    public void setReason_tsp(Date reason_tsp) {
-        this.reason_tsp = reason_tsp;
+    public boolean hasExpired() {
+        return expiration.before(new Date());
     }
 }
