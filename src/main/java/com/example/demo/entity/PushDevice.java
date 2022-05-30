@@ -32,7 +32,7 @@ public class PushDevice implements Serializable {
     private String public_key;
 
     @OneToMany(
-            fetch = FetchType.EAGER,
+            fetch = FetchType.LAZY,
             mappedBy = "pushDevice",
             orphanRemoval = true,
             cascade = CascadeType.ALL)
