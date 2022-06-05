@@ -19,20 +19,20 @@ schedule:
 
 spring:
   datasource:
-    username: root
-    password: springroot
-    url: jdbc:mysql://localhost:3306/db_example?serverTimezone=Europe/Berlin
-    driverClassName: com.mysql.cj.jdbc.Driver
+    username: sa
+    password: password
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
         format_sql: 'true'
     defer-datasource-initialization: 'true'
     show-sql: 'true'
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     task:
       scheduling:
         pool:
