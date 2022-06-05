@@ -11,7 +11,7 @@ schedule:
     interval: 1ms # alle 2 Sekunden ein Insert machen
 
   worker:
-    enabled: 'true' # Scheduling Pushen aktiv
+    enabled: 'false' # Scheduling Pushen aktiv
     interval: 15m # Intervall, z.B. alle 15 Minuten sollen ...
     quantity: 10000 # maximal 1000 Aufträge verarbeitet werden
     start: '00:01' # Start-Zeit
