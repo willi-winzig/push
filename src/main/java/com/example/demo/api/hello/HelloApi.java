@@ -10,6 +10,6 @@ public class HelloApi {
 
     @GetMapping(path = "/hello")
     public @ResponseBody String order() {
-        return "hello2";
+        return "hello23";
     }
 }
