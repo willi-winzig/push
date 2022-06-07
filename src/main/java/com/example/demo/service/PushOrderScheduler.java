@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @EnableAsync
@@ -26,7 +27,7 @@ public class PushOrderScheduler {
     @Autowired
     private PropertyService propertyService;
 
-    @Scheduled(fixedRateString = "#{@propertyService.getWorkerInterval()}")
+    @Scheduled(fixedRateString = "#{@propertyService.getWorkerInterval()}", timeUnit = TimeUnit.MILLISECONDS)
     @Async
     public void worker() {
         if (!propertyService.isScheduleWorkerEnabled()) {
@@ -45,45 +46,52 @@ public class PushOrderScheduler {
                 pushOrderRepository.findBySendIsNullOrderByExpiration(
                         PageRequest.of(0, 1)); // immer nur 1 Order pro Durchlauf
 
-        if (checkOrdersToDelete(pushOrders)) {
-            return; // neuen Durchlauf beginnen, weil Orders gelöscht wurden
+        if (pushOrders.isEmpty()) {
+            return; // nichts mehr gefunden
+        }
+
+        if (pushOrders.size() > 1) {
+            throw new IllegalStateException();
+        }
+        PushOrder pushOrder = pushOrders.get(0);
+
+        if (checkOrderToDelete(pushOrder)) {
+            return; // neuen Durchlauf beginnen, weil Order gelöscht wurden
         }
 
         LocalTime now = LocalTime.now();
         if (now.isAfter(LocalTime.parse(propertyService.getStart()))
                 && now.isBefore(LocalTime.parse(propertyService.getEnd()))
         ) {
-            pushOrders.forEach(
-                    pushOrder -> {
-                        int countUpdates = pushOrderRepository.updatePushOrder(pushOrder.getId(), new Date()); // setze Versand-Datum
-                        if (countUpdates > 0) { // Update wurde gemacht
-                            System.out.println("push");
-                            // wenn Fehler beim Pushen: Order löschen, optional auch PushDevice löschen, wenn Token unregistered
-                        } else {
-                            System.out.println("no push");
-                        }
-                    });
+            int countUpdates = pushOrderRepository.updatePushOrder(pushOrder.getId(), new Date()); // setze Versand-Datum
+            if (countUpdates > 0) { // Update wurde gemacht
+                System.out.println("push");
+                // wenn Fehler beim Pushen: Order löschen, optional auch PushDevice löschen, wenn Token unregistered
+            } else {
+                System.out.println("no push");
+            }
         }
     }
 
-    private boolean checkOrdersToDelete(List<PushOrder> pushOrders) {
-        for (PushOrder o : pushOrders) {
-            if (o.hasExpired()) { // PushOrder abgelaufen
-                pushOrderRepository.delete(o); // Order löschen
-                return true;
-            } else {
-                PushDevice pushDevice = pushDeviceRepository.findPushDevice(o.getUserid());
-                if (pushDevice == null) { // User hat kein PushDevice
-                    pushOrderRepository.deletePushOrder(o.getUserid()); // alle unversendeten Order für User löschen
-                    return true;
-                } else {
-                    if (!pushDevice.getKategorien().contains(o.getKategorie())) {
-                        pushOrderRepository.deletePushOrder(o.getUserid(), o.getKategorie()); // alle unversendeten Order für User und Kategorie löschen
-                        return true;
-                    }
-                }
+    private boolean checkOrderToDelete(PushOrder o) {
+
+        boolean orderDeleted = false;
+
+        if (o.hasExpired()) { // PushOrder abgelaufen
+            pushOrderRepository.delete(o); // Order löschen
+            orderDeleted = true;
+        }
+        long anz;
+        PushDevice pushDevice = pushDeviceRepository.findPushDevice(o.getUserid());
+        if (pushDevice == null) { // User hat kein PushDevice
+            anz = pushOrderRepository.deletePushOrder(o.getUserid()); // alle unversendeten Order für User löschen
+            orderDeleted = anz > 0;
+        } else {
+            if (!pushDevice.getKategorien().contains(o.getKategorie())) {
+                anz = pushOrderRepository.deletePushOrder(o.getUserid(), o.getKategorie()); // alle unversendeten Order für User und Kategorie löschen
+                orderDeleted = anz > 0;
             }
         }
-        return false;
+        return orderDeleted;
     }
 }

@@ -31,11 +31,11 @@ public interface PushOrderRepository extends CrudRepository<PushOrder, Long> {
             value =
                     "DELETE FROM PushOrder p WHERE p.userid = :userid AND p.send IS NULL")
     @Modifying
-    void deletePushOrder(@Param("userid") Long userid);
+    long deletePushOrder(@Param("userid") Long userid);
 
     @Query(
             value =
                     "DELETE FROM PushOrder p WHERE p.userid = :userid AND p.kategorie = :kategorie AND p.send IS NULL")
     @Modifying
-    void deletePushOrder(@Param("userid") Long userid, @Param("kategorie") Kategorie kategorie);
+    long deletePushOrder(@Param("userid") Long userid, @Param("kategorie") Kategorie kategorie);
 }
