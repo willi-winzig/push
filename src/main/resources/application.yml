@@ -13,26 +13,26 @@ schedule:
   worker:
     enabled: 'false' # Scheduling Pushen aktiv
     interval: 15m # Intervall, z.B. alle 15 Minuten sollen ...
-    quantity: 10000 # maximal 1000 Aufträge verarbeitet werden
+    quantity: 44000 # maximal 1000 Aufträge verarbeitet werden
     start: '00:01' # Start-Zeit
     end: '23:59' # Ende-Zeit
 
 spring:
   datasource:
-    username: sa
-    password:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
+    username: root
+    password: springroot
+    url: jdbc:mysql://localhost:3306/db_example?serverTimezone=Europe/Berlin
+    driverClassName: com.mysql.cj.jdbc.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
         format_sql: 'true'
     defer-datasource-initialization: 'true'
-    show-sql: 'true'
+    show-sql: 'false'
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     task:
       scheduling:
         pool:

@@ -4,6 +4,8 @@ import com.example.demo.entity.PushDevice;
 import com.example.demo.entity.PushOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-// @EnableAsync
+@EnableAsync
 public class PushOrderScheduler {
 
     @Autowired
@@ -25,7 +27,7 @@ public class PushOrderScheduler {
     private PropertyService propertyService;
 
     @Scheduled(fixedRateString = "#{@propertyService.getWorkerInterval()}")
-    // @Async
+    @Async
     public void worker() {
         if (!propertyService.isScheduleWorkerEnabled()) {
             return; // Schedule nicht aktiv
@@ -55,8 +57,10 @@ public class PushOrderScheduler {
                     pushOrder -> {
                         int countUpdates = pushOrderRepository.updatePushOrder(pushOrder.getId(), new Date()); // setze Versand-Datum
                         if (countUpdates > 0) { // Update wurde gemacht
-                            System.out.println("jetzt Pushen!");
+                            System.out.println("push");
                             // wenn Fehler beim Pushen: Order löschen, optional auch PushDevice löschen, wenn Token unregistered
+                        } else {
+                            System.out.println("no push");
                         }
                     });
         }
